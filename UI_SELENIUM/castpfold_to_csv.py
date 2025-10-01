@@ -7,6 +7,8 @@ from selenium.webdriver.common.by import By
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 
 def enter_text_in_input(driver, input_id, text):
@@ -134,6 +136,45 @@ def open_atom_info_save_csv(driver, output_directory):
             continue
 
 
+def iterate_pagination(driver):
+    # Locate the pagination element
+    pagination = driver.find_element(By.CSS_SELECTOR, "ul.ant-pagination")
+
+    # Find all pagination items (excluding "Previous" and "Next" buttons)
+    pagination_items = pagination.find_elements(By.CSS_SELECTOR, "li.ant-pagination-item a")
+
+    # Get the last tab number from the list
+    last_tab = pagination_items[-1]
+    tab_count = int(last_tab.text)
+    print(f"Total tabs: {tab_count}")
+
+    for i in range(1, tab_count + 1):
+        # Wait for the current tab to be active
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, f"li.ant-pagination-item-{i}.ant-pagination-item-active"))
+        )
+
+        # Print the current tab number
+        print(f"Pagination tab {i} is displayed")
+
+        write_pocket_info_csv(driver, f"{output_directory}/tab_{i}_pockets.csv")
+        open_atom_info_save_csv(driver, output_directory)
+
+        # If not the last tab, click "Next Page"
+        if i < tab_count:
+            next_button = pagination.find_element(By.CSS_SELECTOR, "li.ant-pagination-next a")
+            next_button.click()
+            # Wait for the next tab to load
+            WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, f"li.ant-pagination-item-{i+1}.ant-pagination-item-active"))
+            )
+
+    # Return to the first tab
+    first_tab = pagination.find_element(By.CSS_SELECTOR, "li.ant-pagination-item-1 a")
+    first_tab.click()
+
+    # Print completion message
+    print(f"All {tab_count} tabs displayed")
 
 
 if __name__ == '__main__':
@@ -163,9 +204,11 @@ if __name__ == '__main__':
     try:
         # Open the specified URL
         driver.get(f"{base_url}?{job_number}")
-        time.sleep(3)
-        write_pocket_info_csv(driver, f"{output_directory}/pocket_info.csv")
-        open_atom_info_save_csv(driver, output_directory)
+        time.sleep(1)
+        iterate_pagination(driver)
+        time.sleep(1)
+       # write_pocket_info_csv(driver, f"{output_directory}/pocket_info.csv")
+       # open_atom_info_save_csv(driver, output_directory)
     except BaseException as e:
         print("While running: ", e)
     finally:
