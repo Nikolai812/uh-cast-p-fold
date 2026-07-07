@@ -140,7 +140,7 @@ def verify_and_copy(
         shutil.copytree(src_dir, dst_dir)
 
     # ------------------------------------------------------------------
-    # 4. Move {OR_NAME}.pdb
+    # 4. Copy {OR_NAME}.pdb
     # ------------------------------------------------------------------
     for or_name in or_names:
         pdb_found = next(
@@ -154,12 +154,10 @@ def verify_and_copy(
             )
             continue
 
-        source_path = os.path.join(selenium_input_dir, pdb_found)
-        dest_path = os.path.join(pymol_input_dir, or_name, pdb_found)
-
-        shutil.move(source_path, dest_path)
-        logger.info(f"Moved PDB file: {pdb_found} to {dest_path}")
-
+        shutil.copy2(
+            os.path.join(selenium_input_dir, pdb_found),
+            os.path.join(pymol_input_dir, or_name, pdb_found)
+        )
 
     # ------------------------------------------------------------------
     # 5. Write 4methods_summary.txt
