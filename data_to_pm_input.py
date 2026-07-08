@@ -32,13 +32,12 @@ class ColorFormatter(logging.Formatter):
         return f"{color}{msg}{self.RESET}"
 # End of ColorFormatter class
 
-
-
 def verify_and_copy(
     selenium_input_dir: str,
     selenium_output_dir: str,
     pymol_input_dir: str,
-    clean_before_copy: bool = False
+    clean_before_copy: bool = False,
+    save_after_copy: bool = False
 ) -> None:
     """
     Verify XLSX outputs per OR_NAME (case-insensitive) and copy
@@ -157,9 +156,18 @@ def verify_and_copy(
         source_path = os.path.join(selenium_input_dir, pdb_found)
         dest_path = os.path.join(pymol_input_dir, or_name, pdb_found)
 
-        shutil.move(source_path, dest_path)
-        logger.info(f"Moved PDB file: {pdb_found} to {dest_path}")
-
+        if save_after_copy:
+            shutil.copy2(source_path, dest_path)
+            logger.info(f"Copied PDB file (save-after-copy enabled): {pdb_found} to {dest_path}")
+        else:
+            if or_name in missing_dict:
+                shutil.copy2(source_path, dest_path)
+                logger.warning(
+                    f"PDB file copied but not moved for OR_NAME='{or_name}' due to missing methods. File: {pdb_found}"
+                )
+            else:
+                shutil.move(source_path, dest_path)
+                logger.info(f"Moved PDB file: {pdb_found} to {dest_path}")
 
     # ------------------------------------------------------------------
     # 5. Write 4methods_summary.txt
@@ -167,7 +175,6 @@ def verify_and_copy(
     timestamp = datetime.now().strftime("%H%M")
     parent_dir = os.path.dirname(pymol_input_dir)
     summary_path = os.path.join(parent_dir, f"4methods_summary_{timestamp}.txt")
-
 
     with open(summary_path, "w") as f:
         f.write(f"The job included {X} .pdb files\n")
@@ -180,8 +187,6 @@ def verify_and_copy(
                 f.write(f"{or_name}: missing [{methods_str}]\n")
 
     logger.info(f"Summary written to: {summary_path}")
-
-
 
 def main() -> None:
 
@@ -239,16 +244,21 @@ def main() -> None:
         action="store_true",
         help="Clean pymol_input_dir before copying"
     )
+    parser.add_argument(
+        "-s", "--save-after-copy",
+        action="store_true",
+        help="Always copy PDB files instead of moving them"
+    )
 
     args = parser.parse_args()
     clean_before = args.clean_before_copy
+    save_after = args.save_after_copy
 
     verify_and_copy(selenium_input_dir, selenium_output_dir, pymol_input_dir,
-                    clean_before_copy=clean_before)
+                    clean_before_copy=clean_before, save_after_copy=save_after)
     logger.info("===============================================================================================")
     logger.info(f"Verify and copy from {selenium_input_dir}, {selenium_output_dir} -> {pymol_input_dir} completed")
     logger.info("===============================================================================================")
-
 
 if __name__ == '__main__':
     main()

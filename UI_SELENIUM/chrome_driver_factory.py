@@ -35,6 +35,7 @@ def create_chrome_driver(
         chrome_options.add_argument("--headless=new")
         chrome_options.add_argument("--disable-gpu")
         chrome_options.add_argument("--window-size=1920,1080")
+        chrome_options.add_argument("--window-position=-3600,-3600")
 
     service = Service(chrome_driver_path)
 
