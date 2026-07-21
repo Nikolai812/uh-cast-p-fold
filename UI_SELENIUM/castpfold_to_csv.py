@@ -3,6 +3,7 @@ import csv
 import logging
 import openpyxl
 import os
+from pathlib import Path
 
 import time
 from configparser import SectionProxy
@@ -223,9 +224,11 @@ def write_cav_all_atom_rows_to_excel(headers, rows, cav_list_all_atom_rows, outp
 
     # Save the workbook to an Excel file
     residues_excel_file_name = FileNamer.get_residues_name(pdb_name, MethodType.CSPF)
-    excel_file_path = f"{output_directory}/{pdb_name}/{residues_excel_file_name}.xlsx"
-    workbook.save(excel_file_path)
+    excel_file_path = Path(output_directory) / pdb_name / f"{residues_excel_file_name}.xlsx"
 
+    # Create the parent directory if it doesn't exist.
+    excel_file_path.parent.mkdir(parents=True, exist_ok=True)
+    workbook.save(excel_file_path)
     logger.info(f"All atom info saved to {excel_file_path} at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
 def write_pockets_to_csv(headers, rows, output_directory, pdb_name):
