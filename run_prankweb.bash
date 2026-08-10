@@ -16,7 +16,7 @@ echo "Start directory: $start_dir" | tee -a "$logfile"
 echo "Logfile defined as $logfile" | tee -a "$logfile"
 
 #CONFIGURATION: Prankweb script location (hardcoded) and output directories
-prankweb_dir="/mnt/c/pipeline/J17Pipelene_P2Rank/p2rank_2.6-alpha"
+prankweb_dir="/mnt/c/pipeline/J17Pipeline_P2Rank/p2rank_2.6-alpha"
 prankweb_output_dir="$prankweb_dir/test_output"
 
 # CONFIGURATION: PDB files input directory, pacupp python feed up directory

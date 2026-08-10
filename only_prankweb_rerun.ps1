@@ -15,6 +15,18 @@ Write-Host "Starting rerun only Prank Web predictions from directory: $start_dir
 
 $base_dir = $start_dir
 
+Write-Output "Starting local prankweb script"
+
+wsl -d Ubuntu --exec /bin/bash -c "./run_prankweb.bash"
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Output "run_prankweb.bash exited with error: terminating further execution"
+    exit 1
+}
+
+Write-Output "Local prankweb run completed. Starting  output handling and creating Excel files"
+
+
 python .\UI_SELENIUM\main.py --rerun-prediction=p2rk
 if ($LASTEXITCODE -ne 0) {
     Write-Output "Python Prank Web predictions: fatal error unhandled, terminating further execution"

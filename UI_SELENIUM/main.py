@@ -1,12 +1,12 @@
 import argparse
-import configparser
+
 from configparser import SectionProxy
 from datetime import datetime
 import logging
 
 from castpfold_to_csv import run_castpfold
 from cavity_plus_to_csv import run_cavity_plus
-from prankweb_to_csv import run_prankweb
+from prankweb_local_out_to_csv import process_p2rank_local_output
 from pupp_out_to_csv import  process_pupp_out_directory
 from utils import load_config
 import os
@@ -61,7 +61,9 @@ def run_4_predictions(pdb_files: list[str], config: SectionProxy) -> None:
 
     logger.info(f"Expecting that java pacupp has already completed. Processing pacupp output files for {pdb_files}  at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     pacupp_python_feedup = config['pacupp_python_feedup']
+
     process_pupp_out_directory(pacupp_python_feedup, config)
+    process_p2rank_local_output(pdb_files, config)
 
     #raise Exception("Temporary stop")
 
@@ -76,11 +78,15 @@ def run_4_predictions(pdb_files: list[str], config: SectionProxy) -> None:
         logger.info(f"Starting CavityPlus for {pdb_file} at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         run_cavity_plus(pdb_file, config)
         logger.info(f"Starting PrankWev for {pdb_file} at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-        run_prankweb(pdb_file, config)
+
+        # !!!! run_prankweb(pdb_file, config) replaced by local p2rank run, see above
+
         logger.info(f"Completing 4predictions for {pdb_file} at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         logger.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
         logger.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
     pass
+
+
 
 def main(rerun_prediction: str = None) -> None:
     # Setting logger and color logging fot console
@@ -127,9 +133,8 @@ def main(rerun_prediction: str = None) -> None:
             logger.info(f'Re-Running  only CavityPlus for {pdb_file} at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}')
             run_cavity_plus(pdb_file, config)
     elif rerun_prediction == "p2rk":
-        for pdb_file in pdb_files:
-            logger.info(f'Re-Running only PrankWeb for {pdb_file} at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}')
-            run_prankweb(pdb_file, config)
+        logger.info(f'Re-processing  PrankWeb local output for {", ".join(pdb_files)}\n at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}')
+        process_p2rank_local_output (pdb_files, config)
     elif rerun_prediction == "pupp":
         logger.info(f"Skipping web predictions. Only processing pacupp output files. at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         pacupp_python_feedup = config['pacupp_python_feedup']

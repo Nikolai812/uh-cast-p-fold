@@ -16,8 +16,12 @@ Write-Host "Starting PostAlphaFold cavity predictions from directory: $start_dir
 $base_dir = $start_dir
 Write-Output "Starting pacupp script for JMOL"
 wsl -d Ubuntu --exec /bin/bash -c "./run_pacupp.bash"
-
 Write-Output "Pacupp over JMOL completed. Starting python 4 predictions processing"
+
+Write-Output "Starting local prankweb script"
+wsl -d Ubuntu --exec /bin/bash -c "./run_prankweb.bash"
+Write-Output "Local prankweb script completed"
+
 python .\UI_SELENIUM\main.py
 if ($LASTEXITCODE -ne 0) {
     Write-Output "Python 4-predictions: fatal error unhandled, terminating further execution"

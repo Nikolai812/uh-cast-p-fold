@@ -24,8 +24,11 @@ def load_config():
 
     config['DEFAULT']['input_dir'] = os.path.join(data_lake_dir, config['DEFAULT']['input_dir'])
     config['DEFAULT']['output_dir'] = os.path.join(data_lake_dir, config['DEFAULT']['output_dir'])
+
     config['DEFAULT']['pacupp_python_feedup'] = os.path.join(script_dir, config['DEFAULT']['pacupp_python_feedup'])
+    # for web p2rank download:
     config['DEFAULT']['prankweb_temp'] = os.path.join(script_dir, config['DEFAULT']['prankweb_temp'])
+    # for local p2rank run config path for output is absolute and needs not to be updated
     # End of relative path update
 
     logging.info(f"Configuration loaded from {config_path}, sections: {config.sections()} defaults: {config.defaults()}")
