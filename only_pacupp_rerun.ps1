@@ -29,6 +29,8 @@ if ($LASTEXITCODE -ne 0) {
     Write-Output "Python pacupp predictions: fatal error unhandled, terminating further execution"
     exit 1
 }
+
+python data_to_pm_input.py -c
 Write-Output "only pacupp .ps1 script completed"
 
 

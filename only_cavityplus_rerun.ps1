@@ -20,6 +20,8 @@ if ($LASTEXITCODE -ne 0) {
     Write-Output "Cavityplus redictions: fatal error unhandled, terminating further execution"
     exit 1
 }
+
+python data_to_pm_input.py -c
 Write-Output "only cavity plus .ps1 script completed"
 
 

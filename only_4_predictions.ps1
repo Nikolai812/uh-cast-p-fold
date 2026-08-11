@@ -27,6 +27,8 @@ if ($LASTEXITCODE -ne 0) {
     Write-Output "Python 4-predictions: fatal error unhandled, terminating further execution"
     exit 1
 }
+
+python -m UI_SELENIUM.methods_summary
 Write-Output "4 predictions .ps1 script completed"
 
 

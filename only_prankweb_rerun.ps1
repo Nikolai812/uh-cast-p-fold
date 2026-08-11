@@ -32,6 +32,9 @@ if ($LASTEXITCODE -ne 0) {
     Write-Output "Python Prank Web predictions: fatal error unhandled, terminating further execution"
     exit 1
 }
+
+#python -m UI_SELENIUM.methods_summary
+python data_to_pm_input.py -c
 Write-Output "only Prank Web .ps1 script completed"
 
 

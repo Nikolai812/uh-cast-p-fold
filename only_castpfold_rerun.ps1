@@ -20,6 +20,9 @@ if ($LASTEXITCODE -ne 0) {
     Write-Output "Castpfold predictions: fatal error unhandled, terminating further execution"
     exit 1
 }
+
+#python -m UI_SELENIUM.methods_summary
+python data_to_pm_input.py -c
 Write-Output "only castpfold plus .ps1 script completed"
 
 
